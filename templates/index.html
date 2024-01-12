@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sentiment Predictor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Sentiment Predictor</h1>
+        <form id="predict-form" class="mb-4">
+            <div class="form-group">
+                <textarea id="text-input" class="form-control" rows="3"></textarea>
+            </div>
+        </form>
+        <div id="sentiment" class="alert alert-primary" role="alert"></div>
+        <div id="very-positive" class="alert alert-success" role="alert"></div>
+        <div id="positive" class="alert alert-success" role="alert"></div>
+        <div id="neutral" class="alert alert-warning" role="alert"></div>
+        <div id="negative" class="alert alert-danger" role="alert"></div>
+        <div id="very-negative" class="alert alert-danger" role="alert"></div>
+        <div id="version"><a href="/version">BERTSenti1.0</a> by <strong>Ethan Yan Xu</strong> | website version 0.4</div>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        $('#text-input').on('input', function() {
+            var text = $(this).val();
+            $('#feedback-text').text(text);
+            $.ajax({
+                url: '/predict',
+                method: 'POST',
+                data: {text: text},
+                success: function(response) {
+                    $('#sentiment').text(response.sentiment);
+                    $('#displayed-sentiment').text(response.sentiment);
+                    var probabilities = response.probabilities[0];
+                    $('#very-negative').text('Very Negative: ' + (probabilities[0] * 100).toFixed(2) + '%');
+                    $('#negative').text('Negative: ' + (probabilities[1] * 100).toFixed(2) + '%');
+                    $('#neutral').text('Neutral: ' + (probabilities[2] * 100).toFixed(2) + '%');
+                    $('#positive').text('Positive: ' + (probabilities[3] * 100).toFixed(2) + '%');
+                    $('#very-positive').text('Very Positive: ' + (probabilities[4] * 100).toFixed(2) + '%');
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>
